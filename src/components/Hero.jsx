@@ -85,6 +85,24 @@ export default function Hero() {
             Computer Engineering Undergraduate and Results-driven Full Stack Developer. I build highly responsive frontend interfaces, optimized backend systems, and production-ready applications utilizing React.js, Next.js, Node.js, and databases. Let's transform your ideas into scalable web realities.
           </p>
 
+          {/* Integrated Inline Stats Cards */}
+          <div className="hero-stats-row">
+            <div className="hero-stat-card glass-card">
+              <Briefcase size={20} className="stat-icon-violet" />
+              <div>
+                <span className="stat-num">2+ Internships</span>
+                <span className="stat-lbl">Patel Infotech & AI BI Street</span>
+              </div>
+            </div>
+            <div className="hero-stat-card glass-card">
+              <Award size={20} className="stat-icon-emerald" />
+              <div>
+                <span className="stat-num">8.86 CGPA</span>
+                <span className="stat-lbl">SAKEC B.Tech Academic Score</span>
+              </div>
+            </div>
+          </div>
+
           <div className="hero-actions">
             <a
               href="#contact"
@@ -119,16 +137,17 @@ export default function Hero() {
 
         {/* Hero Right Content (Floating Developer Visual Card) */}
         <div className="hero-visual">
-          <div className="glass-card coding-editor-card">
-            <div className="editor-header">
-              <span className="window-dot red"></span>
-              <span className="window-dot yellow"></span>
-              <span className="window-dot green"></span>
-              <span className="editor-filename">KhushbuChheda.json</span>
-            </div>
-            <div className="editor-body">
-              <pre>
-                <code>
+          <div className="editor-wrapper">
+            <div className="glass-card coding-editor-card">
+              <div className="editor-header">
+                <span className="window-dot red"></span>
+                <span className="window-dot yellow"></span>
+                <span className="window-dot green"></span>
+                <span className="editor-filename">KhushbuChheda.json</span>
+              </div>
+              <div className="editor-body">
+                <pre>
+                  <code>
 {`{
   "name": "Khushbu Chheda",
   "education": {
@@ -145,25 +164,9 @@ export default function Hero() {
   "availabile_for_freelance": true,
   "motto": "Build scalable, pixel-perfect products"
 }`}
-                </code>
-              </pre>
-            </div>
-          </div>
-
-          {/* Float stats tags */}
-          <div className="hero-stat-bubble stat-bubble-1 glass-card animate-float" style={{ animationDelay: '0.5s' }}>
-            <Briefcase size={16} className="text-secondary-glow" />
-            <div>
-              <p className="bubble-title">2+ Internships</p>
-              <p className="bubble-subtitle">Industry Experience</p>
-            </div>
-          </div>
-
-          <div className="hero-stat-bubble stat-bubble-2 glass-card animate-float" style={{ animationDelay: '1.2s' }}>
-            <Award size={16} className="text-accent-glow" />
-            <div>
-              <p className="bubble-title">8.86 CGPA</p>
-              <p className="bubble-subtitle">Academic Excellence</p>
+                  </code>
+                </pre>
+              </div>
             </div>
           </div>
         </div>

@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 export default function Contact() {
+  const formRef = useRef();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,9 +30,15 @@ export default function Contact() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    // Map standard form name back to state keys
+    const stateKey = name === 'from_name' ? 'name' : (name === 'reply_to' ? 'email' : (name === 'project_type' ? 'projectType' : name));
+    setFormData(prev => ({ ...prev, [stateKey]: value }));
+    if (formErrors[stateKey]) {
+      setFormErrors(prev => ({ ...prev, [stateKey]: '' }));
+    }
+    // Clear global submit error if any
+    if (formErrors.submit) {
+      setFormErrors(prev => ({ ...prev, submit: '' }));
     }
   };
 
@@ -42,12 +51,33 @@ export default function Contact() {
     }
 
     setIsLoading(true);
-    // Simulate API submission
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSubmitted(true);
-      setFormData({ name: '', email: '', projectType: 'Full-Stack Web App', message: '' });
-    }, 1200);
+
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
+
+    // Fallback simulated submit if placeholders are not updated
+    if (serviceId === 'YOUR_SERVICE_ID' || templateId === 'YOUR_TEMPLATE_ID' || publicKey === 'YOUR_PUBLIC_KEY') {
+      console.warn('EmailJS parameters are using placeholders. Simulating submission.');
+      setTimeout(() => {
+        setIsLoading(false);
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', projectType: 'Full-Stack Web App', message: '' });
+      }, 1200);
+      return;
+    }
+
+    emailjs.sendForm(serviceId, templateId, formRef.current, publicKey)
+      .then((result) => {
+        setIsLoading(false);
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', projectType: 'Full-Stack Web App', message: '' });
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setFormErrors({ submit: 'Failed to send message: ' + (error?.text || error?.message || 'Unknown error') });
+        console.error('EmailJS Error:', error);
+      });
   };
 
   return (
@@ -133,8 +163,15 @@ export default function Contact() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} noValidate>
+              <form ref={formRef} onSubmit={handleSubmit} noValidate>
                 <h3 className="panel-title">Inquire About a Project</h3>
+                
+                {/* Global error message */}
+                {formErrors.submit && (
+                  <div className="error-message" style={{ fontSize: '0.9rem', marginBottom: '1rem', border: '1px solid #ef4444', padding: '0.5rem 0.75rem', borderRadius: '0.35rem', background: 'rgba(239, 68, 68, 0.05)' }}>
+                    {formErrors.submit}
+                  </div>
+                )}
                 
                 {/* Name field */}
                 <div className="form-group">
@@ -142,7 +179,7 @@ export default function Contact() {
                   <input
                     type="text"
                     id="name"
-                    name="name"
+                    name="from_name"
                     value={formData.name}
                     onChange={handleInputChange}
                     className={`form-control ${formErrors.name ? 'input-error' : ''}`}
@@ -158,7 +195,7 @@ export default function Contact() {
                   <input
                     type="email"
                     id="email"
-                    name="email"
+                    name="reply_to"
                     value={formData.email}
                     onChange={handleInputChange}
                     className={`form-control ${formErrors.email ? 'input-error' : ''}`}
@@ -173,7 +210,7 @@ export default function Contact() {
                   <label htmlFor="projectType" className="form-label">Service Needed</label>
                   <select
                     id="projectType"
-                    name="projectType"
+                    name="project_type"
                     value={formData.projectType}
                     onChange={handleInputChange}
                     className="form-control"
